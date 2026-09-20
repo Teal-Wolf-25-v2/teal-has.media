@@ -14,7 +14,7 @@ async function loadModrinthMods() {
 
   const res = await fetch(`${MODRINTH_API}?${params}`, {
     headers: {
-      "User-Agent": "tw25.net (contact@tw25.net)"
+      "User-Agent": "teal-has.media (contact@teal-has.media)"
     }
   });
 
