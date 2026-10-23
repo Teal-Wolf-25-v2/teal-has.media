@@ -3,14 +3,14 @@ const { name, value } = Astro.props
 ---
 
 <table class="border-collapse divide-y divide-teal-65/50 bg-blue-5/50 rounded-md light:bg-teal-85/50 light:divide-yellow-75/50 portrait:min-h-20">
-    <thead>
+    <thead class="h-1/2">
     <tr class="info-name">
-        <th scope="col" class="w-80 h-1/2">{name}</th>
+        <th scope="col" class="w-80">{name}</th>
     </tr>
     </thead>
-    <tbody>
+    <tbody class="h-1/2">
     <tr class="info-value">
-        <th scope="row" class="h-1/2">{value}</th>
+        <th scope="row">{value}</th>
     </tr>
     </tbody>
 </table>
