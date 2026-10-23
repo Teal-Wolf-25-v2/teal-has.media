@@ -1,0 +1,193 @@
+---
+
+interface NavLink {
+    label: string;
+    href: string;
+    external?: boolean;
+}
+
+interface Props {
+    links?: NavLink[];
+    brand?: string;
+    brandHref?: string;
+    /** Which edge the mobile panel slides in from */
+    side?: "left" | "right";
+    /** Accessible label for the toggle button */
+    label?: string;
+    /** Extra classes for the outer <header> */
+    class?: string;
+    /** Tailwind classes for the mobile panel's top padding. Raise it if your header is taller than 4rem. */
+    panelTop?: string;
+}
+
+const {
+    links = [
+        { label: "Home", href: "/" },
+    ],
+    brand = "Teal Wolf 25",
+    brandHref = "/",
+    side = "right",
+    label = "Menu",
+    class: className = "",
+    panelTop = "pt-20",
+} = Astro.props;
+
+/* ---------- Customize here (full class strings only, so Tailwind can detect them) ---------- */
+const ui = {
+    header:
+        "border-b border-blue-15 bg-blue-5 text-teal-75 light:border-yellow-75 light:bg-blue-95 light:text-yellow-20",
+    panel: "bg-blue-5 light:bg-blue-95",
+    scrim: "bg-black/60 light:bg-black/40",
+    brand: "text-lg font-bold text-teal-90 light:text-blue-10",
+    link: "text-teal-90 hover:text-teal-60 light:text-yellow-10 light:hover:text-yellow-35",
+    linkCurrent:
+        "aria-[current=page]:font-semibold aria-[current=page]:text-green-75 aria-[current=page]:underline aria-[current=page]:underline-offset-4 light:aria-[current=page]:text-pink-30",
+    focus:
+        "focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal-50 light:focus-visible:outline-blue-50",
+    toggleOpen:
+        "group-data-[open=true]:text-teal-50 light:group-data-[open=true]:text-pink-35",
+};
+/* ------------------------------------------------------------------------------------------- */
+
+const panelSide =
+    side === "right" ? "right-0 translate-x-full" : "left-0 -translate-x-full";
+
+const currentPath = Astro.url.pathname.replace(/\/$/, "") || "/";
+const isCurrent = (href: string) =>
+    !href.startsWith("http") && (href.replace(/\/$/, "") || "/") === currentPath;
+---
+
+<header
+        data-hm
+        data-open="false"
+        class:list={[
+            "group sticky top-0 z-50 flex min-h-16 items-center justify-between px-5 py-2",
+            ui.header,
+            className,
+        ]}
+>
+    <slot name="brand">
+        <a href={brandHref} class:list={[ui.brand, ui.focus, "no-underline"]}>
+            {brand}
+        </a>
+    </slot>
+
+    <button
+            type="button"
+            data-hm-toggle
+            aria-expanded="false"
+            aria-controls="hm-panel"
+            aria-label={label}
+            class:list={[
+                "relative z-30 -mr-2 grid size-11 cursor-pointer place-items-center border-0 bg-transparent p-0 md:hidden",
+                "transition-colors duration-300 motion-reduce:transition-none",
+                ui.toggleOpen,
+                ui.focus,
+            ]}
+    >
+    <span class="relative block h-3.5 w-6" aria-hidden="true">
+      <span
+              class="absolute left-0 top-0 h-0.5 w-full rounded-full bg-current transition-all duration-300 motion-reduce:transition-none group-data-[open=true]:translate-y-1.5 group-data-[open=true]:rotate-45"
+      ></span>
+      <span
+              class="absolute left-0 top-1.5 h-0.5 w-full rounded-full bg-current transition-all duration-300 motion-reduce:transition-none group-data-[open=true]:opacity-0"
+      ></span>
+      <span
+              class="absolute left-0 top-3 h-0.5 w-full rounded-full bg-current transition-all duration-300 motion-reduce:transition-none group-data-[open=true]:-translate-y-1.5 group-data-[open=true]:-rotate-45"
+      ></span>
+    </span>
+    </button>
+
+    <nav
+            id="hm-panel"
+            data-hm-panel
+            aria-label="Main"
+            class:list={[
+      "fixed inset-y-0 z-20 invisible w-[min(20rem,85vw)] overflow-y-auto px-5 pb-8",
+                "transition-[transform,visibility] duration-300 ease-out motion-reduce:transition-none",
+                "group-data-[open=true]:visible group-data-[open=true]:translate-x-0",
+                panelSide,
+                panelTop,
+                ui.panel,
+      "md:visible md:static md:flex md:w-auto md:translate-x-0 md:items-center md:gap-7",
+                "md:overflow-visible md:bg-transparent md:p-0 md:transition-none",
+            ]}
+    >
+        <ul class="m-0 flex list-none flex-col gap-1 p-0 md:flex-row md:gap-7">
+            {
+                links.map((link) => (
+                        <li>
+                            <a
+                                    href={link.href}
+                                    aria-current={isCurrent(link.href) ? "page" : undefined}
+                                    target={link.external ? "_blank" : undefined}
+                                    rel={link.external ? "noopener noreferrer" : undefined}
+                                    class:list={[
+                                        "block py-2 text-2xl no-underline transition-colors duration-300 motion-reduce:transition-none md:py-1 md:text-base",
+                                        ui.link,
+                                        ui.linkCurrent,
+                                        ui.focus,
+                                    ]}
+                            >
+                                {link.label}
+                            </a>
+                        </li>
+                ))
+            }
+        </ul>
+        <slot />
+    </nav>
+
+    <div
+            data-hm-scrim
+            class:list={[
+                "invisible fixed inset-0 z-10 opacity-0 transition-[opacity,visibility] duration-300 motion-reduce:transition-none md:hidden",
+                "group-data-[open=true]:visible group-data-[open=true]:opacity-100",
+                ui.scrim,
+            ]}
+    >
+    </div>
+</header>
+
+<script>
+    function initHamburgerMenus() {
+        document.querySelectorAll<HTMLElement>("[data-hm]").forEach((menu) => {
+            if (menu.dataset.ready) return;
+            menu.dataset.ready = "true";
+
+            const toggle = menu.querySelector<HTMLButtonElement>("[data-hm-toggle]")!;
+            const panel = menu.querySelector<HTMLElement>("[data-hm-panel]")!;
+            const scrim = menu.querySelector<HTMLElement>("[data-hm-scrim]")!;
+            const desktop = window.matchMedia("(min-width: 48rem)");
+
+            const isOpen = () => menu.dataset.open === "true";
+
+            const setOpen = (open: boolean, restoreFocus = true) => {
+                menu.dataset.open = String(open);
+                toggle.setAttribute("aria-expanded", String(open));
+                document.documentElement.style.overflow = open ? "hidden" : "";
+                panel.toggleAttribute("inert", !open && !desktop.matches);
+                if (!open && restoreFocus) toggle.focus({ preventScroll: true });
+            };
+
+            toggle.addEventListener("click", () => setOpen(!isOpen()));
+            scrim.addEventListener("click", () => setOpen(false));
+            panel.addEventListener("click", (e) => {
+                if ((e.target as HTMLElement).closest("a")) setOpen(false, false);
+            });
+            document.addEventListener("keydown", (e) => {
+                if (e.key === "Escape" && isOpen()) setOpen(false);
+            });
+
+            desktop.addEventListener("change", () => {
+                setOpen(false, false);
+                panel.toggleAttribute("inert", !desktop.matches);
+            });
+
+            panel.toggleAttribute("inert", !desktop.matches);
+        });
+    }
+
+    initHamburgerMenus();
+    document.addEventListener("astro:page-load", initHamburgerMenus);
+</script>

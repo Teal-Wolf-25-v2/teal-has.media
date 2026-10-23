@@ -1,0 +1,33 @@
+---
+import Image from "astro/components/Image.astro";
+import Info from "./Info Piece.astro";
+import Socials from './Socials.astro'
+---
+
+<div class="about-outer flex flex-col justify-center min-h-[93vh] text-teal-90 light:text-yellow-5">
+    <div class="about flex flex-row portrait:flex-col min-w-screen justify-center">
+        <div class="about-image">
+            <Image src="/images/logo.png" class="rounded-4xl" width={350} height={350} loading="eager" alt="Illustration of a cheerful teal wolf character wearing a purple witch hat with an orange star emblem and a small dog curled up on the brim. The wolf raises one hand holding a glowing, sparkling spell with a small floating cup above it, and a fluffy tail curls behind. The background is a warm gradient from gold to magenta." />
+        </div>
+        <div class="info grid grid-cols-2 portrait:grid-cols-1 grid-rows-3 portrait:grid-rows-6 gap-2">
+            <Info name="Name" value="Teal" />
+            <Info name="Pronouns" value="fae/faer, any non masc is okay" />
+            <Info name="What I do" value="Programming, Voice Acting, Writing" />
+            <Info name="Other Hobbies" value="Rollerblading, Music, Art" />
+            <Info name="Favorite Games" value="Castle Crashers, Minecraft" />
+            <Info name="Dislikes" value="Rice, Loud Noises" />
+        </div>
+    </div>
+    <p class="text-center text-green-75 light:text-pink-10">
+        Hi! I'm Teal. I like to do whatever I can to share my creativity, whether that be one of the things above or making videos or<br>
+        streaming, whatever makes you smile. Some programming languages I know are Python, Kotlin, Java and a couple others. If<br>
+        you want to check out my projects, you can look at my socials. I hope you enjoy your time here. :3
+    </p>
+    <Socials />
+</div>
+
+<style>
+    div {
+        font-family: 'Shantell Sans', sans-serif;
+    }
+</style>
